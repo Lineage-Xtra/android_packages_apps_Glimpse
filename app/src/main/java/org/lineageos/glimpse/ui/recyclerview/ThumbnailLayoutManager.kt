@@ -11,11 +11,24 @@ import org.lineageos.glimpse.ext.px
 import org.lineageos.glimpse.viewmodels.AlbumViewModel
 
 class ThumbnailLayoutManager(
-    context: Context,
+    private val context: Context,
     adapter: RecyclerView.Adapter<*>,
-) : DisplayAwareGridLayoutManager(context, 4, 4.px) {
+    initialSpanCount: Int = 4 // Make this a parameter with a default
+) : DisplayAwareGridLayoutManager(context, initialSpanCount, 4.px) {
+
     init {
         spanSizeLookup = ThumbnailSpanSizeLookup(adapter, spanCount)
+    }
+
+    // Update the span count dynamically
+    fun updateTargetSpanCount(newTargetSpanCount: Int, adapter: RecyclerView.Adapter<*>) {
+        // Explicitly call the companion object function
+        val newSpanCount = DisplayAwareGridLayoutManager.getSpanCount(context, newTargetSpanCount, 4.px)
+
+        if (this.spanCount != newSpanCount) {
+            this.spanCount = newSpanCount
+            this.spanSizeLookup = ThumbnailSpanSizeLookup(adapter, newSpanCount)
+        }
     }
 
     private class ThumbnailSpanSizeLookup(
